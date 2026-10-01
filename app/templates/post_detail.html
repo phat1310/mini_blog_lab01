@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-9">
+        <!-- Nút quay lại trang chủ -->
+        <div class="mb-3">
+            <a href="{{ url_for('main.index') }}" class="btn btn-sm btn-outline-secondary">
+                <i class="bi bi-arrow-left me-1"></i>Về trang chủ
+            </a>
+        </div>
+
+        <article class="card border-0 shadow-sm rounded-3 mb-4">
+            <div class="card-body p-4 p-md-5">
+                <!-- Tiêu đề bài viết -->
+                <h1 class="display-6 fw-bold mb-3 text-dark">{{ post.title }}</h1>
+
+                <!-- Thông tin meta (Tác giả, Thời gian, Nút tác vụ nếu là tác giả) -->
+                <div class="d-flex flex-wrap justify-content-between align-items-center pb-3 mb-4 border-bottom text-muted">
+                    <div class="d-flex align-items-center mb-2 mb-md-0">
+                        <span class="badge bg-primary bg-opacity-10 text-primary fs-6 px-3 py-2 rounded-pill me-3">
+                            <i class="bi bi-person-fill me-1"></i>{{ post.author.username }}
+                        </span>
+                        <span>
+                            <i class="bi bi-calendar3 me-1"></i>{{ post.timestamp.strftime('%d/%m/%Y lúc %H:%M') }}
+                        </span>
+                    </div>
+
+                    <!-- Khu vực quyền tác giả (Edit & Delete) -->
+                    {% if current_user.is_authenticated and current_user == post.author %}
+                    <div>
+                        <a href="{{ url_for('main.edit_post', post_id=post.id) }}" class="btn btn-outline-primary btn-sm me-2">
+                            <i class="bi bi-pencil-square me-1"></i>Chỉnh sửa
+                        </a>
+                        <button type="button" class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteDetailModal">
+                            <i class="bi bi-trash-fill me-1"></i>Xóa bài viết
+                        </button>
+
+                        <!-- Modal Xác nhận Xóa -->
+                        <div class="modal fade" id="deleteDetailModal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content">
+                                    <div class="modal-header bg-danger text-white">
+                                        <h5 class="modal-title" id="modalLabel"><i class="bi bi-exclamation-triangle-fill me-2"></i>Xác nhận xóa bài viết</h5>
+                                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body text-start">
+                                        Bạn có chắc chắn muốn xóa vĩnh viễn bài viết <strong>"{{ post.title }}"</strong>? Hành động này sẽ không thể khôi phục lại.
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy bỏ</button>
+                                        <form action="{{ url_for('main.delete_post', post_id=post.id) }}" method="POST" class="d-inline">
+                                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                            <button type="submit" class="btn btn-danger">Xác nhận Xóa</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Toàn bộ nội dung bài viết -->
+                <div class="post-body-text fs-5 text-secondary">
+                    {{ post.body }}
+                </div>
+            </div>
+        </article>
+    </div>
+</div>
+{% endblock %}
